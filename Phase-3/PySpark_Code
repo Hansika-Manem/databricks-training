@@ -1,12 +1,11 @@
 --Business Pipeline Exercises
 
 --1. Read sales data -> clean nulls -> calculate daily sales
-from pyspark.sql.functions import sum as _sum
-
+from pyspark.sql.functions import sum as _sum, col
 daily_sales = (orders
-    .filter(col("amount").isNotNull())
+    .filter(col("total_amount").isNotNull())
     .groupBy("order_date")
-    .agg(_sum("amount").alias("daily_sales"))
+    .agg(_sum("total_amount").alias("daily_sales"))
     .orderBy("order_date"))
 daily_sales.show()
 
@@ -15,16 +14,15 @@ daily_sales.show()
 city_revenue = (customers.filter(col("city").isNotNull())
     .join(orders, "customer_id")
     .groupBy("city")
-    .agg(_sum("amount").alias("total_revenue"))
+    .agg(_sum("total_amount").alias("total_revenue"))
     .orderBy(col("total_revenue").desc()))
 city_revenue.show()
 
 
 --3. Find repeat customers (>2 orders)
-from pyspark.sql.functions import count
-
+from pyspark.sql.functions import count, col
 repeat_customers = (customers.join(orders, "customer_id")
-    .groupBy("customer_id", "name")
+    .groupBy("customer_id", "first_name", "last_name")
     .agg(count("order_id").alias("order_count"))
     .filter(col("order_count") > 2))
 repeat_customers.show()
@@ -32,11 +30,11 @@ repeat_customers.show()
 
 --4. Find highest spending customer in each city
 from pyspark.sql.window import Window
-from pyspark.sql.functions import rank
+from pyspark.sql.functions import rank, sum as _sum, col
 
 customer_spend = (customers.join(orders, "customer_id")
-    .groupBy("city", "customer_id", "name")
-    .agg(_sum("amount").alias("total_spend")))
+    .groupBy("city", "customer_id", "first_name", "last_name")
+    .agg(_sum("total_amount").alias("total_spend")))
 
 city_window = Window.partitionBy("city").orderBy(col("total_spend").desc())
 
@@ -48,10 +46,11 @@ top_per_city.show()
 
 
 --5. Build final reporting table with customer, city, total spend, order count
+from pyspark.sql.functions import sum as _sum, col, count
 reporting_table = (customers.join(orders, "customer_id")
-    .groupBy("customer_id", "name", "city")
+    .groupBy("customer_id", "first_name", "last_name", "city")
     .agg(
-        _sum("amount").alias("total_spend"),
+        _sum("total_amount").alias("total_spend"),
         count("order_id").alias("order_count")
     )
     .orderBy(col("total_spend").desc()))

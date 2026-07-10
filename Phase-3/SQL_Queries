@@ -1,47 +1,76 @@
 --Business Pipeline Exercises 
 
--- 1.Read sales data -> clean nulls -> calculate daily sales
-SELECT order_date, SUM(amount) AS daily_sales
+--1. Read sales data → clean nulls → calculate daily sales
+SELECT order_date,
+       SUM(total_amount) AS daily_sales
 FROM orders
-WHERE amount IS NOT NULL
+WHERE total_amount IS NOT NULL
 GROUP BY order_date
-ORDER BY order_date
+ORDER BY order_date;
 
--- 2.Read customer data -> clean invalid rows -> city-wise revenue
-SELECT c.city, SUM(o.amount) AS total_revenue
+
+--2. Read customer data → clean invalid rows → city-wise revenue 
+SELECT c.city,
+       SUM(o.total_amount) AS total_revenue
 FROM customers c
-JOIN orders o ON c.customer_id = o.customer_id
+JOIN orders o
+ON c.customer_id = o.customer_id
 WHERE c.city IS NOT NULL
 GROUP BY c.city
-ORDER BY total_revenue DESC
+ORDER BY total_revenue DESC;
 
 
--- 3.Find repeat customers (>2 orders)
-SELECT c.customer_id, c.name, COUNT(o.order_id) AS order_count
-FROM customers c
-JOIN orders o ON c.customer_id = o.customer_id
-GROUP BY c.customer_id, c.name
-HAVING COUNT(o.order_id) > 2
-
-
--- 4.Find highest spending customer in each city
-SELECT city, customer_id, name, total_spend
-FROM (
-    SELECT c.city, c.customer_id, c.name,
-           SUM(o.amount) AS total_spend,
-           RANK() OVER (PARTITION BY c.city ORDER BY SUM(o.amount) DESC) AS rnk
-    FROM customers c
-    JOIN orders o ON c.customer_id = o.customer_id
-    GROUP BY c.city, c.customer_id, c.name
-) ranked
-WHERE rnk = 1
-
-
--- 5.Build final reporting table with customer, city, total spend, order count
-SELECT c.customer_id, c.name, c.city,
-       SUM(o.amount) AS total_spend,
+--3. Find repeat customers (>2 orders)
+SELECT c.customer_id,
+       CONCAT(c.first_name, ' ', c.last_name) AS customer_name,
        COUNT(o.order_id) AS order_count
 FROM customers c
-JOIN orders o ON c.customer_id = o.customer_id
-GROUP BY c.customer_id, c.name, c.city
-ORDER BY total_spend DESC
+JOIN orders o
+ON c.customer_id = o.customer_id
+GROUP BY c.customer_id, c.first_name, c.last_name
+HAVING COUNT(o.order_id) > 2;
+
+
+--4. Find highest spending customer in each city
+SELECT city,
+       customer_id,
+       customer_name,
+       total_spend
+FROM (
+    SELECT
+        c.city,
+        c.customer_id,
+        CONCAT(c.first_name, ' ', c.last_name) AS customer_name,
+        SUM(o.total_amount) AS total_spend,
+        RANK() OVER (
+            PARTITION BY c.city
+            ORDER BY SUM(o.total_amount) DESC
+        ) AS rnk
+    FROM customers c
+    JOIN orders o
+    ON c.customer_id = o.customer_id
+    GROUP BY
+        c.city,
+        c.customer_id,
+        c.first_name,
+        c.last_name
+) ranked
+WHERE rnk = 1;
+
+
+--5. Build final reporting table with customer, city, total spend, order count
+SELECT
+    c.customer_id,
+    CONCAT(c.first_name, ' ', c.last_name) AS customer_name,
+    c.city,
+    SUM(o.total_amount) AS total_spend,
+    COUNT(o.order_id) AS order_count
+FROM customers c
+JOIN orders o
+ON c.customer_id = o.customer_id
+GROUP BY
+    c.customer_id,
+    c.first_name,
+    c.last_name,
+    c.city
+ORDER BY total_spend DESC;

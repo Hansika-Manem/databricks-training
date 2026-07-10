@@ -1,0 +1,50 @@
+--Guided Exercises
+
+--1. Total order amount for each customer
+from pyspark.sql.functions import sum as _sum
+result1 = orders.groupBy("customer_id").agg(_sum("amount").alias("total_amount"))
+result1.show()
+
+
+--2.Top 3 customers by total spend
+top3 = (orders.groupBy("customer_id")
+        .agg(_sum("amount").alias("total_amount"))
+        .orderBy(col("total_amount").desc())
+        .limit(3))
+top3.show()
+
+
+--3.Customers with no orders
+no_orders = (customers.join(orders, on="customer_id", how="left")
+             .filter(col("order_id").isNull())
+             .select("customer_id", "name"))
+no_orders.show()
+
+
+--4.  City-wise total revenue
+city_revenue = (customers.join(orders, on="customer_id", how="inner")
+                .groupBy("city")
+                .agg(_sum("amount").alias("total_revenue")))
+city_revenue.show()
+
+
+--5.Average order amount per customer
+from pyspark.sql.functions import avg
+avg_per_customer = orders.groupBy("customer_id").agg(avg("amount").alias("avg_amount"))
+avg_per_customer.show()
+
+
+--6.Customers with more than one order
+from pyspark.sql.functions import count
+repeat_customers = (orders.groupBy("customer_id")
+                     .agg(count("order_id").alias("order_count"))
+                     .filter(col("order_count") > 1))
+repeat_customers.show()
+
+
+--7.Sort customers by total spend descending
+sorted_spend = (customers.join(orders, on="customer_id", how="inner")
+                .groupBy("customer_id", "name")
+                .agg(_sum("amount").alias("total_spend"))
+                .orderBy(col("total_spend").desc()))
+sorted_spend.show()

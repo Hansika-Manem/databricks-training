@@ -24,13 +24,13 @@ no_orders.show()
 --4.  City-wise total revenue
 city_revenue = (customers.join(orders, on="customer_id", how="inner")
                 .groupBy("city")
-                .agg(_sum("amount").alias("total_revenue")))
+                .agg(_sum("total_amount").alias("total_revenue")))
 city_revenue.show()
 
 
 --5.Average order amount per customer
 from pyspark.sql.functions import avg
-avg_per_customer = orders.groupBy("customer_id").agg(avg("amount").alias("avg_amount"))
+avg_per_customer = orders.groupBy("customer_id").agg(avg("total_amount").alias("avg_amount"))
 avg_per_customer.show()
 
 
@@ -44,7 +44,7 @@ repeat_customers.show()
 
 --7.Sort customers by total spend descending
 sorted_spend = (customers.join(orders, on="customer_id", how="inner")
-                .groupBy("customer_id", "name")
-                .agg(_sum("amount").alias("total_spend"))
+                .groupBy("customer_id", "first_name", "last_name")
+                .agg(_sum("total_amount").alias("total_spend"))
                 .orderBy(col("total_spend").desc()))
 sorted_spend.show()

@@ -74,4 +74,4 @@ It includes SQL fundamentals, joins, analytical queries, SQL functions, window f
 
 # Author
 
-### Sk.Arsha Sumaiyya
+### Hansika Manem

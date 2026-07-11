@@ -1,0 +1,26 @@
+--Task 1 & 2: Group by segment, count customers
+segment_counts = segmented.groupBy("segment").agg(count("*").alias("customer_count"))
+segment_counts.show()
+
+
+--Task 3: Quantile-based segmentation
+quantiles = customer_spend.approxQuantile("total_spend", [0.33, 0.66], 0.0)
+low, high = quantiles
+print("cutoffs:", low, high)   # ~445.0, ~1635.0 on your data
+
+quantile_segmented = customer_spend.withColumn(
+    "segment_quantile",
+    when(col("total_spend") > high, "Gold")
+    .when((col("total_spend") > low) & (col("total_spend") <= high), "Silver")
+    .otherwise("Bronze")
+)
+quantile_segmented.groupBy("segment_quantile").agg(count("*").alias("customer_count")).show()
+
+
+--Task 4: Compare all methods side-by-side
+comparison = (segmented.alias("a")
+    .join(quantile_segmented.select("customer_id", "segment_quantile").alias("b"), "customer_id")
+    .join(ranked_segmented.select("customer_id", "segment_rank_based").alias("c"), "customer_id")
+    .select("customer_id", "total_spend", "segment", "segment_quantile", "segment_rank_based"))
+
+comparison.orderBy(col("total_spend").desc()).show(50, truncate=False)

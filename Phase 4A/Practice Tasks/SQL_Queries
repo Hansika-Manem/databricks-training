@@ -1,0 +1,53 @@
+--Task 1 & 2: Group by segment, count customers
+SELECT segment, COUNT(*) AS customer_count
+FROM (
+    SELECT *, CASE 
+        WHEN total_spend > 2000 THEN 'Gold'
+        WHEN total_spend BETWEEN 500 AND 2000 THEN 'Silver'
+        ELSE 'Bronze'
+    END AS segment
+    FROM customer_spend
+) t
+GROUP BY segment
+
+
+--Task 3: Quantile-based segmentation
+WITH cutoffs AS (
+    SELECT
+        PERCENTILE_APPROX(total_spend, 0.33) AS p33,
+        PERCENTILE_APPROX(total_spend, 0.66) AS p66
+    FROM customer_spend
+)
+SELECT cs.customer_id, cs.total_spend,
+    CASE
+        WHEN cs.total_spend > c.p66 THEN 'Gold'
+        WHEN cs.total_spend > c.p33 THEN 'Silver'
+        ELSE 'Bronze'
+    END AS segment_quantile
+FROM customer_spend cs
+CROSS JOIN cutoffs c
+ORDER BY cs.total_spend DESC
+
+
+--Task 4: Compare all methods side-by-side
+WITH cutoffs AS (
+    SELECT PERCENTILE_APPROX(total_spend, 0.33) AS p33,
+           PERCENTILE_APPROX(total_spend, 0.66) AS p66
+    FROM customer_spend
+),
+combined AS (
+    SELECT cs.customer_id, cs.total_spend,
+        CASE WHEN cs.total_spend > 2000 THEN 'Gold'
+             WHEN cs.total_spend >= 500 THEN 'Silver'
+             ELSE 'Bronze' END AS segment_fixed,
+        CASE WHEN cs.total_spend > c.p66 THEN 'Gold'
+             WHEN cs.total_spend > c.p33 THEN 'Silver'
+             ELSE 'Bronze' END AS segment_quantile,
+        CASE WHEN PERCENT_RANK() OVER (ORDER BY cs.total_spend) >= 0.66 THEN 'Gold'
+             WHEN PERCENT_RANK() OVER (ORDER BY cs.total_spend) >= 0.33 THEN 'Silver'
+             ELSE 'Bronze' END AS segment_rank_based
+    FROM customer_spend cs
+    CROSS JOIN cutoffs c
+)
+SELECT * FROM combined ORDER BY total_spend DESC
+

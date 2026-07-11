@@ -1,0 +1,39 @@
+--Method 1: Conditional Logic
+segmented = customer_spend.withColumn(
+    "segment",
+    when(col("total_spend") > 2000, "Gold")
+    .when((col("total_spend") >= 500) & (col("total_spend") <= 2000), "Silver")
+    .otherwise("Bronze")
+).orderBy(col("total_spend").desc())
+segmented.show(10)
+
+
+--Method 2: Bucketizer (MLlib)
+from pyspark.ml.feature import Bucketizer
+
+splits = [-float("inf"), 500, 2000, float("inf")]
+bucketizer = Bucketizer(splits=splits, inputCol="total_spend", outputCol="bucket_index")
+bucketed = bucketizer.transform(customer_spend)
+
+bucketed = bucketed.withColumn(
+    "segment_from_bucketizer",
+    when(col("bucket_index") == 0, "Bronze")
+    .when(col("bucket_index") == 1, "Silver")
+    .otherwise("Gold")
+)
+bucketed.select("customer_id", "total_spend", "bucket_index", "segment_from_bucketizer").show(10)
+
+
+--Method 5: Window-based ranking (percent_rank)
+window = Window.orderBy("total_spend")
+
+ranked = customer_spend.withColumn("spend_percentile", percent_rank().over(window))
+
+ranked_segmented = ranked.withColumn(
+    "segment_rank_based",
+    when(col("spend_percentile") >= 0.66, "Gold")
+    .when(col("spend_percentile") >= 0.33, "Silver")
+    .otherwise("Bronze")
+).orderBy(col("total_spend").desc())
+
+ranked_segmented.show(10)

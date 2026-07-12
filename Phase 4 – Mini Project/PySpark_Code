@@ -1,0 +1,82 @@
+## Data Cleaning
+sales_clean = (sales
+    .dropna(subset=["customer_id"])
+    .dropDuplicates()
+    .filter(col("total_amount") > 0)
+    .withColumn("sale_date", to_date(col("sale_date"), "dd-MM-yyyy")))
+
+customers_clean = (customers
+    .dropna(subset=["customer_id"])
+    .dropDuplicates())
+
+sales_clean.createOrReplaceTempView("sales")
+customers_clean.createOrReplaceTempView("customers")
+
+
+## Task 1: Daily Sales → Output: date, total_sales
+task1 = (sales_clean
+    .groupBy("sale_date")
+    .agg(_sum("total_amount").alias("total_sales"))
+    .orderBy("sale_date"))
+task1.show(20)
+
+
+## Task 2: City-wise Revenue → Output: city, total_revenue
+task2 = (sales_clean.join(customers_clean, "customer_id")
+    .groupBy("city")
+    .agg(_sum("total_amount").alias("total_revenue"))
+    .orderBy(col("total_revenue").desc()))
+task2.show()
+
+
+## Task 3: Top 5 Customers → Output: customer_name, total_spend
+task3 = (sales_clean.join(customers_clean, "customer_id")
+    .withColumn("customer_name", concat_ws(" ", col("first_name"), col("last_name")))
+    .groupBy("customer_name")
+    .agg(_sum("total_amount").alias("total_spend"))
+    .orderBy(col("total_spend").desc())
+    .limit(5))
+task3.show()
+
+
+## Task 4: Repeat Customers (>1 order) → Output: customer_id, order_count
+task4 = (sales_clean
+    .groupBy("customer_id")
+    .agg(count("sale_id").alias("order_count"))
+    .filter(col("order_count") > 1))
+task4.show()
+
+
+## Task 5: Customer Segmentation → Create business logic: total_spend > 10000 → Gold 5000–10000 → Silver <5000 → Bronze Output: customer_name, total_spend, segment
+customer_spend = (sales_clean.join(customers_clean, "customer_id")
+    .withColumn("customer_name", concat_ws(" ", col("first_name"), col("last_name")))
+    .groupBy("customer_name")
+    .agg(_sum("total_amount").alias("total_spend")))
+
+task5 = customer_spend.withColumn(
+    "segment",
+    when(col("total_spend") > 10000, "Gold")
+    .when((col("total_spend") >= 5000) & (col("total_spend") <= 10000), "Silver")
+    .otherwise("Bronze")
+).orderBy(col("total_spend").desc())
+
+task5.show()
+
+
+## Task 6: Final Reporting Table → Combine all relevant insights into a final table. Output should include: customer_name, city, total_spend, order_count, segment
+final_df = (sales_clean.join(customers_clean, "customer_id")
+    .withColumn("customer_name", concat_ws(" ", col("first_name"), col("last_name")))
+    .groupBy("customer_name", "city")
+    .agg(
+        _sum("total_amount").alias("total_spend"),
+        count("sale_id").alias("order_count")
+    )
+    .withColumn(
+        "segment",
+        when(col("total_spend") > 10000, "Gold")
+        .when((col("total_spend") >= 5000) & (col("total_spend") <= 10000), "Silver")
+        .otherwise("Bronze")
+    )
+    .orderBy(col("total_spend").desc()))
+
+final_df.show(50, truncate=False)

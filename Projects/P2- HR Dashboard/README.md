@@ -1,24 +1,24 @@
-# 🚀 HR Dashboard using PySpark
+#  HR Dashboard using PySpark
 
-## 📌 Overview
+## Overview
 
 This project demonstrates HR analytics using PySpark DataFrame operations. It analyzes employee data and generates meaningful insights such as employee distribution, hiring trends, department statistics, and salary analysis.
 
-## 🛠️ Tech Stack
+## Tech Stack
 
-* 🐍 Python
-* ⚡ PySpark
-* 🔥 Apache Spark
+*  Python
+*  PySpark
+*  Apache Spark
 
-## ✨ Features
+## Features
 
-* 👨‍💼 Count male and female employees
-* 🏢 Find average age department-wise
-* 📅 Generate hiring trends by year
-* 🌍 Create city-wise employee distribution
-* 💰 Identify highest paid employees
+*  Count male and female employees
+*  Find average age department-wise
+*  Generate hiring trends by year
+*  Create city-wise employee distribution
+*  Identify highest paid employees
 
-## 🔄 Workflow
+## Workflow
 
 ```text
 Employee Data
@@ -36,21 +36,18 @@ Salary Analysis
 HR Insights Dashboard
 ````
 
-## 📈 Output
+## Output
 
-* ✅ Gender-wise Employee Count
-* ✅ Department-wise Average Age
-* ✅ Year-wise Hiring Trends
-* ✅ City-wise Employee Distribution
-* ✅ Highest Paid Employee Details
+*  Gender-wise Employee Count
+*  Department-wise Average Age
+*  Year-wise Hiring Trends
+*  City-wise Employee Distribution
+*  Highest Paid Employee Details
 
-## 🎯 Learning Outcomes
+## Learning Outcomes
 
 * PySpark DataFrame Operations
 * Data Aggregation using groupBy()
 * Data Analysis and Reporting
 * Spark SQL Functions
 * HR Analytics Fundamentals
-
-⭐ Built with PySpark for hands-on HR Analytics and Data Processing practice.
-

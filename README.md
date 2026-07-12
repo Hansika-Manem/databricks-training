@@ -1,8 +1,8 @@
 # Databricks Data Engineering Training Repository
 
-👩‍💻 **Name:** Katta Venkata Tejaswini  
-🎓 **Program:** Databricks Data Engineering Training  
-💻 **Technology Stack:** SQL | PySpark | Apache Spark | Databricks | Python
+ **Name:** Katta Venkata Tejaswini  
+ **Program:** Databricks Data Engineering Training  
+ **Technology Stack:** SQL | PySpark | Apache Spark | Databricks | Python
 
 ---
 
@@ -301,13 +301,13 @@ Through this repository, I gained practical experience in:
 
 | Module | Status |
 |---------|--------|
-| Week 1 – SQL | ✅ Completed |
-| Week 2 – SQL | ✅ Completed |
-| Week 3 – SQL | ✅ Completed |
-| PySpark Fundamentals | ✅ Completed |
-| Phase 3A – Data Quality | ✅ Completed |
-| Phase 3 – ETL Pipeline | ✅ Completed |
-| Phase 4 – Business Mini Project | ✅ Completed |
-| Phase 4A – Bucketing & Segmentation | ✅ Completed |
+| Week 1 – SQL |  Completed |
+| Week 2 – SQL |  Completed |
+| Week 3 – SQL |  Completed |
+| PySpark Fundamentals |  Completed |
+| Phase 3A – Data Quality |  Completed |
+| Phase 3 – ETL Pipeline |  Completed |
+| Phase 4 – Business Mini Project |  Completed |
+| Phase 4A – Bucketing & Segmentation |  Completed |
 
 ---

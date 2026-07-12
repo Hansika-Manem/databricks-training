@@ -1,24 +1,24 @@
-# 🚀 Project 3: Data Engineering Scenarios
+#  Project 3: Data Engineering Scenarios
 
-## 📌 Overview
+## Overview
 
 This project demonstrates common Data Engineering operations using PySpark, including data cleaning, transformation, integration, and aggregation.
 
-## 🛠️ Tech Stack
+## Tech Stack
 
-* 🐍 Python
-* ⚡ PySpark
-* 🧱 Databricks
+*  Python
+*  PySpark
+*  Databricks
 
-## ✨ Features
+## Features
 
-* 🧹 Remove duplicate records
-* 🔧 Handle missing values
-* 🔗 Join multiple datasets
-* ⚙️ Optimize partitions
-* 📊 Generate summary reports
+*  Remove duplicate records
+*  Handle missing values
+*  Join multiple datasets
+* Optimize partitions
+*  Generate summary reports
 
-## 🔄 Workflow
+## Workflow
 
 ```text
 Raw Data
@@ -36,14 +36,14 @@ Create Summary Tables
 Business Insights
 ```
 
-## 📈 Output
+## Output
 
-* ✅ Cleaned Employee Data
-* ✅ Joined Department Information
-* ✅ Aggregated Summary Table
-* ✅ Optimized Data Pipeline
+*  Cleaned Employee Data
+*  Joined Department Information
+*  Aggregated Summary Table
+*  Optimized Data Pipeline
 
-## 🎯 Learning Outcomes
+## Learning Outcomes
 
 * Data Cleaning
 * ETL Processing
@@ -51,4 +51,8 @@ Business Insights
 * Data Transformation
 * PySpark Fundamentals
 
-⭐ Built with PySpark for hands-on Data Engineering practice.
+ Built with PySpark for hands-on Data Engineering practice.
+
+
+
+

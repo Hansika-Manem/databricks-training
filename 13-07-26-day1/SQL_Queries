@@ -1,0 +1,184 @@
+#Display the first 5 rows
+SELECT *
+FROM Students
+LIMIT 5;
+
+#Check the total number of rows and columns
+SELECT COUNT(*) AS Total_Rows
+FROM Students;
+SELECT COUNT(*) AS Total_Columns
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME = 'Students';
+
+#Find the number of missing values in each column
+SELECT
+SUM(student_id IS NULL) AS student_id_missing,
+SUM(student_name IS NULL) AS student_name_missing,
+SUM(department IS NULL) AS department_missing,
+SUM(city IS NULL) AS city_missing,
+SUM(marks IS NULL) AS marks_missing,
+SUM(attendance IS NULL) AS attendance_missing
+FROM Students;
+
+#Replace missing values in the marks column with the average marks
+
+#Update the table
+
+UPDATE Students
+SET marks = (
+    SELECT avg_marks
+    FROM (
+        SELECT AVG(marks) AS avg_marks
+        FROM Students
+    ) AS temp
+)
+WHERE marks IS NULL;
+
+#Display only the name and marks columns
+SELECT student_name, marks
+FROM Students;
+
+#Filtering & Sorting
+#Display students who scored more than 160 marks
+SELECT *
+FROM Students
+WHERE marks > 160;
+
+#Display students from the CS department
+SELECT *
+FROM Students
+WHERE department='CS';
+
+#Attendance >85 and Marks >150
+SELECT *
+FROM Students
+WHERE attendance > 85
+AND marks > 150;
+
+#Sort by marks (Descending)
+SELECT *
+FROM Students
+ORDER BY marks DESC;
+
+#Top 3 students based on marks
+SELECT *
+FROM Students
+ORDER BY marks DESC
+LIMIT 3;
+
+#Column Transformations
+#Create Percentage column
+SELECT *,
+(marks/200)*100 AS percentage
+FROM Students;
+
+#Create Grade column
+SELECT *,
+(marks/200)*100 AS percentage,
+CASE
+    WHEN (marks/200)*100 >=85 THEN 'A'
+    WHEN (marks/200)*100 >=70 THEN 'B'
+    WHEN (marks/200)*100 >=50 THEN 'C'
+    ELSE 'Fail'
+END AS grade
+FROM Students;
+
+#Add 5 bonus marks
+#Display only
+
+SELECT *,
+marks+5 AS bonus_marks
+FROM Students;
+#Update permanently
+UPDATE Students
+SET marks = marks + 5;
+
+#Create Result column
+
+SELECT *,
+CASE
+    WHEN (marks/200)*100 >=40 THEN 'Pass'
+    ELSE 'Fail'
+END AS Result
+FROM Students;
+
+#Convert student names to uppercase
+SELECT
+UPPER(student_name) AS student_name
+FROM Students;
+
+#GroupBy & Aggregation
+#Average marks of each department
+SELECT department,
+AVG(marks) AS Average_Marks
+FROM Students
+GROUP BY department;
+
+#Maximum marks in each city
+SELECT city,
+MAX(marks) AS Highest_Marks
+FROM Students
+GROUP BY city;
+
+#Count students in each department
+SELECT department,
+COUNT(*) AS Total_Students
+FROM Students
+GROUP BY department;
+
+#Department with highest average marks
+SELECT department,
+AVG(marks) AS Avg_Marks
+FROM Students
+GROUP BY department
+ORDER BY Avg_Marks DESC
+LIMIT 1;
+
+#Pivot table (Average marks by department and city)
+SELECT
+department,
+AVG(CASE WHEN city='Hyderabad' THEN marks END) AS Hyderabad,
+AVG(CASE WHEN city='Bangalore' THEN marks END) AS Bangalore,
+AVG(CASE WHEN city='Chennai' THEN marks END) AS Chennai,
+AVG(CASE WHEN city='Pune' THEN marks END) AS Pune
+FROM Students
+GROUP BY department;
+
+#Advanced Level
+#Rank students based on marks
+SELECT
+student_name,
+marks,
+RANK() OVER(ORDER BY marks DESC) AS Rank_No
+FROM Students;
+
+#Students whose marks are above overall average
+SELECT *
+FROM Students
+WHERE marks >
+(
+SELECT AVG(marks)
+FROM Students
+);
+
+#Min-Max Scaling
+SELECT
+student_name,
+marks,
+(marks-(SELECT MIN(marks) FROM Students))/
+((SELECT MAX(marks) FROM Students)-
+(SELECT MIN(marks) FROM Students))
+AS Scaled_Marks
+FROM Students;
+
+#Categorize attendance
+SELECT
+student_name,
+attendance,
+CASE
+    WHEN attendance >=90 THEN 'Excellent'
+    WHEN attendance >=80 THEN 'Good'
+    WHEN attendance >=70 THEN 'Average'
+    ELSE 'Poor'
+END AS Attendance_Category
+FROM Students;
